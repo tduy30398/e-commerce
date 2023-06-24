@@ -1,4 +1,5 @@
 const mongoose = require('mongoose'); // Erase if already required
+const bcrypt = require('bcrypt');
 
 // Declare the Schema of the Mongo model
 var userSchema = new mongoose.Schema(
@@ -56,6 +57,15 @@ var userSchema = new mongoose.Schema(
         timestamps: true
     }
 );
+
+// Xử lý trước khi save
+userSchema.pre('save', async function (next) {
+    // Nếu ko chỉnh sửa password thì chạy vào if này => next
+    if (!this.isModified('password')) next();
+    // Nếu đang chỉnh sửa password thì ko chạy vào if => xuống đây hash lại password
+    const salt = bcrypt.genSaltSync(10);
+    this.password = await bcrypt.hash(this.password, salt);
+});
 
 //Export the model
 module.exports = mongoose.model('User', userSchema);
