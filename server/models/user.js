@@ -67,5 +67,14 @@ userSchema.pre('save', async function (next) {
     this.password = await bcrypt.hash(this.password, salt);
 });
 
+// Define các function
+userSchema.methods = {
+    // check password user đăng nhập và password đang lưu trong DB (hashed)
+    checkPassword: async function (password) {
+        const isCorrectPassword = await bcrypt.compare(password, this.password);
+        return isCorrectPassword;
+    }
+};
+
 //Export the model
 module.exports = mongoose.model('User', userSchema);
